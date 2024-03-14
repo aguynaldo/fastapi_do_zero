@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "fastapi-do-zero"
+version = "0.1.0"
+description = "Projeto em FastAPI para acompanhamento do curso do Dunossauro."
+authors = ["Aguinaldo S Freitas  <aguynaldo@gmail.com>"]
+readme = "README.md"
+packages = [{include = "fastapi_do_zero"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.0"
+pydantic = {extras = ["email"], version = "^2.6.3"}
+uvicorn = {extras = ["standard"], version = "^0.28.0"}
+sqlalchemy = "^2.0.28"
+pydantic-settings = "^2.2.1"
+alembic = "^1.13.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.2"
+pytest-cov = "^4.1.0"
+taskipy = "^1.12.2"
+blue = "^0.9.1"
+ruff = "^0.3.0"
+httpx = "^0.27.0"
+isort = "^5.13.2"
+
+[tool.ruff]
+line-length = 79
+exclude = ['.venv', 'migrations']
+
+[tool.isort]
+profile = "black"
+line_length = 79
+extend_skip = ['migrations']
+
+[tool.pytest.ini_options]
+pythonpath = "."
+
+[tool.blue]
+extend-exclude = '(migrations/)'
+
+[tool.taskipy.tasks]
+lint = 'ruff check . && blue --check . --diff && isort --check . --diff'
+format = 'blue . && isort .'
+run = 'uvicorn fastapi_do_zero.app:app --reload'
+pre_test = 'task lint'
+test = 'pytest -s -x --cov=fastapi_do_zero -vv'
+post_test = 'coverage html'
+clean = 'rm -rf .ruff_cache .pytest_cache htmlcov .coverage tests/__pycache__ fastapi_do_zero/__pycache__'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
