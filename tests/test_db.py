@@ -5,7 +5,9 @@ from fastapi_do_zero.models import User
 
 def test_create_user(session):
     new_user = User(
-        username='alice', password='secret', email='teste@test.com'
+        username='alice',
+        password='secret',
+        email='teste@test.com',
     )
 
     session.add(new_user)
