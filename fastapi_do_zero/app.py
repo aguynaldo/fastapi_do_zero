@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from fastapi_do_zero.database import get_session
 from fastapi_do_zero.models import User
-from fastapi_do_zero.schemas import Message, UserPublic, UserSchema
+from fastapi_do_zero.schemas import Message, UserList, UserPublic, UserSchema
 
 app = FastAPI()
 
@@ -32,3 +32,11 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
     session.refresh(db_user)
 
     return db_user
+
+
+@app.get('/users/', response_model=UserList)
+def read_users(
+    skip: int = 0, limit: int = 100, session: Session = Depends(get_session)
+):
+    users = session.scalars(select(User).offset(skip).limit(limit)).all()
+    return {'users': users}
