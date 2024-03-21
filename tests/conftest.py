@@ -7,6 +7,7 @@ from sqlalchemy.pool import StaticPool
 from fastapi_do_zero.app import app
 from fastapi_do_zero.database import get_session
 from fastapi_do_zero.models import Base, User
+from fastapi_do_zero.security import get_password_hash
 
 
 @pytest.fixture
@@ -37,11 +38,15 @@ def client(session):
 @pytest.fixture
 def user(session):
     user = User(
-        username='Teste', email='teste@teste.com', password='123mudar@'
+        username='Teste',
+        email='teste@teste.com',
+        password=get_password_hash('123mudar@'),
     )
 
     session.add(user)
     session.commit()
     session.refresh(user)
+
+    user.clean_password = '123mudar@'
 
     return user
