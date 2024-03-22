@@ -8,6 +8,18 @@ def test_root_deve_retornar_200_e_ola_mundo(client):
     assert response.json() == {'message': 'Olá mundo'}
 
 
+def test_get_token(client, user):
+    response = client.post(
+        '/token',
+        data={'username': user.email, 'password': user.clean_password},
+    )
+    token = response.json()
+
+    assert response.status_code == 200
+    assert 'access_token' in token
+    assert 'token_type' in token
+
+
 def test_create_user(client):
     response = client.post(
         '/users',
@@ -71,9 +83,10 @@ def test_read_user_specific_not_found(client):
     assert response.json() == {'detail': 'Usuário não encontrado.'}
 
 
-def test_udpate_user(client, user):
+def test_udpate_user(client, user, token):
     response = client.put(
-        '/users/1',
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'bob',
             'email': 'bob@sponja.com',
@@ -89,9 +102,10 @@ def test_udpate_user(client, user):
     }
 
 
-def test_update_user_not_exist(client, user):
+def test_update_user_not_exist(client, user, token):
     response = client.put(
         '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'bob',
             'email': 'bob@sponja.com',
@@ -99,19 +113,29 @@ def test_update_user_not_exist(client, user):
         },
     )
 
-    assert response.status_code == 404
-    assert response.json() == {'detail': 'Usuário não encontrado.'}
+    assert response.status_code == 400
+    assert response.json() == {
+        'detail': 'Não tem permissão para executar essa função.'
+    }
 
 
-def test_delete_user(client, user):
-    response = client.delete('/users/1')
+def test_delete_user(client, user, token):
+    response = client.delete(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == 200
     assert response.json() == {'message': 'Usuário deletado com sucesso.'}
 
 
-def test_delete_user_not_exist(client):
-    response = client.delete('/users/2')
+def test_delete_user_not_exist(client, token):
+    response = client.delete(
+        '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
-    assert response.status_code == 404
-    assert response.json() == {'detail': 'Usuário não encontrado.'}
+    assert response.status_code == 400
+    assert response.json() == {
+        'detail': 'Não tem permissão para executar essa função.'
+    }
