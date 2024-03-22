@@ -97,7 +97,7 @@ def update_user(
     if current_user.id != user_id:
         raise HTTPException(
             status_code=400,
-            detail='Não tem permissão para executar essa função.'
+            detail='Não tem permissão para executar essa função.',
         )
 
     current_user.username = user.username
@@ -110,13 +110,19 @@ def update_user(
 
 
 @app.delete('/users/{user_id}', response_model=Message)
-def delete_user(user_id: int, session: Session = Depends(get_session)):
-    user_db = session.scalar(select(User).where(User.id == user_id))
+def delete_user(
+    user_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
 
-    if not user_db:
-        raise HTTPException(status_code=404, detail='Usuário não encontrado.')
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=400,
+            detail='Não tem permissão para executar essa função.',
+        )
 
-    session.delete(user_db)
+    session.delete(current_user)
     session.commit()
 
     return {'message': 'Usuário deletado com sucesso.'}
