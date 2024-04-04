@@ -49,7 +49,7 @@ run = 'uvicorn fastapi_do_zero.app:app --reload'
 pre_test = 'task lint'
 test = 'pytest -s -x --cov=fastapi_do_zero -vv'
 post_test = 'coverage html'
-clean = 'rm -rf .ruff_cache .pytest_cache htmlcov .coverage tests/__pycache__ fastapi_do_zero/__pycache__ migrations/__pycache__ migrations/versions/__pycache__'
+clean = 'rm -rf .ruff_cache .pytest_cache htmlcov .coverage tests/__pycache__ fastapi_do_zero/__pycache__ migrations/__pycache__ migrations/versions/__pycache__ fastapi_do_zero/routes/__pycache__'
 
 [build-system]
 requires = ["poetry-core"]
