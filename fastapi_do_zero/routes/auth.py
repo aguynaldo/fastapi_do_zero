@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
@@ -8,13 +10,15 @@ from fastapi_do_zero.models import User
 from fastapi_do_zero.schemas import Token
 from fastapi_do_zero.security import create_access_token, verify_password
 
+OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
+Session = Annotated[Session, Depends(get_session)]
 router = APIRouter(prefix='/auth', tags=['auth'])
 
 
 @router.post('/token', response_model=Token)
 def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    session: Session = Depends(get_session),
+    form_data: OAuth2Form,
+    session: Session,
 ):
     user = session.scalar(select(User).where(User.email == form_data.username))
 
