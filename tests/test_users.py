@@ -97,20 +97,20 @@ def test_update_user_with_wrong_user(client, other_user, token):
     }
 
 
-# def test_update_user_not_exist(client, user, token):
-#     response = client.put(
-#         '/users/2',
-#         headers={'Authorization': f'Bearer {token}'},
-#         json={
-#             'username': 'bob',
-#             'email': 'bob@sponja.com',
-#             'password': 'mudeinoteste',
-#         },
-#     )
-#     assert response.status_code == 400
-#     assert response.json() == {
-#         'detail': 'Não tem permissão para executar essa função.'
-#     }
+def test_update_user_not_exist(client, user, token):
+    response = client.put(
+        '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'bob',
+            'email': 'bob@sponja.com',
+            'password': 'mudeinoteste',
+        },
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        'detail': 'Não tem permissão para executar essa função.'
+    }
 
 
 def test_delete_user(client, user, token):
@@ -121,6 +121,17 @@ def test_delete_user(client, user, token):
 
     assert response.status_code == 200
     assert response.json() == {'message': 'Usuário deletado com sucesso.'}
+
+
+def test_delete_user_wrong_user(client, other_user, token):
+    response = client.delete(
+        f'/users/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        'detail': 'Não tem permissão para executar essa função.'
+    }
 
 
 def test_delete_user_not_exist(client, token):
